@@ -30,9 +30,8 @@ h1 {
 }
 
 .taskTitle {
-    flex: 1;
+    flex: 0 1 200px;
     min-width: 0;
-    width: auto;
 }
 
 .task.selected {
@@ -41,6 +40,7 @@ h1 {
 }
 
 .taskChecks {
+    flex: 1;
     cursor: default;
     user-select: none;
     display: flex;
@@ -49,10 +49,14 @@ h1 {
     white-space: nowrap;
     min-width: 0;
     overflow: hidden;
+    
 }
 
 .taskProgress {
-    margin-left: auto;
+    flex-shrink: 0;
+    width: 60px;
+    text-align: right;
+    font-weight: bold;
 }
 
 .checkItem {
