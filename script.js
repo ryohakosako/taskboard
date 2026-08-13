@@ -135,32 +135,8 @@ document.getElementById("taskDescriptionView").innerHTML = `
 const descriptionInput =
     document.getElementById("taskDescriptionInput");
 
-function resizeDescription() {
-    descriptionInput.style.height = "auto";
-
-    const maxHeight = window.innerHeight * 0.6;
-
-    const height = Math.min(
-        descriptionInput.scrollHeight,
-        maxHeight
-    );
-
-    descriptionInput.style.height = height + "px";
-
-    if (descriptionInput.scrollHeight > maxHeight) {
-        descriptionInput.style.overflowY = "auto";
-    } else {
-        descriptionInput.style.overflowY = "hidden";
-    }
-}
-
-resizeDescription();
-
 descriptionInput.addEventListener("input", function () {
-    resizeDescription();
-
     selectedTask.description = this.value;
-
     saveData();
 });
 
