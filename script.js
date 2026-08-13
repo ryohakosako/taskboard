@@ -140,8 +140,18 @@ function resizeDescription() {
 
     const maxHeight = window.innerHeight * 0.6;
 
-    descriptionInput.style.height =
-        Math.min(descriptionInput.scrollHeight, maxHeight) + "px";
+    const height = Math.min(
+        descriptionInput.scrollHeight,
+        maxHeight
+    );
+
+    descriptionInput.style.height = height + "px";
+
+    if (descriptionInput.scrollHeight > maxHeight) {
+        descriptionInput.style.overflowY = "auto";
+    } else {
+        descriptionInput.style.overflowY = "hidden";
+    }
 }
 
 resizeDescription();
