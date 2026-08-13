@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Tree</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>タスクボード Tree</h1>
+    <div id="input">
+        <input id="taskName" placeholder="タスク名">
+        <button id="addButton">追加</button>
+    </div>
+    <div class="main">
+        <div id="tree"></div>
+    </div>
+
+    <div id="taskModal" class="hidden">
+
+        <div class="modalContent">
+
+            <div class="modalHeader">
+
+                <h2 id="taskNameView">タスク</h2>
+
+                <div>
+                    <button id="deleteTaskButton">削除</button>
+                    <button id="closeModalButton">×</button>
+                </div>
+
+            </div>
+            
+            <div class="modalBody">
+
+                <div class="memoArea">
+
+                    <h3>メモ</h3>
+
+                    <div id="taskDescriptionView"></div>
+
+                </div>
+
+                <div class="checklistArea">
+
+                    <h3>チェックリスト</h3>
+
+                    <div id="checklistView"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

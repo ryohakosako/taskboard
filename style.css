@@ -1,0 +1,351 @@
+body {
+    font-family: sans-serif;
+    margin: 30px;
+    background: #222;
+    color: white;
+}
+
+.main {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+#tree {
+    flex: 1;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+    margin: 5px;
+    background: #444;
+    border-radius: 8px;
+}
+
+.taskTitle {
+    flex: none;
+    width: 200px;
+}
+
+.task.selected {
+    background-color: #4caf50;
+    color: white;
+}
+
+.taskChecks {
+    cursor: default;
+    user-select: none;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.taskProgress {
+    margin-left: auto;
+}
+
+.checkItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #ddd;
+    min-height: 1.5em;
+}
+
+.checkItem:hover {
+    background: #555;
+}
+
+.checkMark {
+    flex-shrink: 0;
+    cursor: default;
+
+}
+
+.checkText {
+    display: block;
+    flex: 1;
+    min-height: 20px;
+    cursor: default;
+}
+
+.checkText,
+.editChecklistInput {
+    flex: 1;
+    font: inherit;
+    line-height: inherit;
+}
+
+.editChecklistInput {
+    color: inherit;
+    font: inherit;
+    background: transparent;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    height: 1.5em;
+    padding: 0;
+    margin: 0;
+    line-height: inherit;
+    font: inherit;
+}
+
+#taskModal {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.5);
+
+    z-index: 1000;
+}
+
+#taskModal.hidden {
+    display: none;
+}
+
+.modalContent {
+
+    width: 80%;
+    height: 80%;
+
+    background: #2b2b2b;
+
+    border: 1px solid #555;
+
+    border-radius: 10px;
+
+    padding: 20px;
+
+    overflow: auto;
+}
+
+.modalBody {
+    display: flex;
+    gap: 20px;
+    height: calc(100% - 70px);
+}
+
+.memoArea {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #333;
+
+    border-radius: 10px;
+
+    padding: 15px;
+}
+
+.checklistArea {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #333;
+
+    border-radius: 10px;
+
+    padding: 15px;
+
+    overflow-y: auto;
+}
+
+.memoArea h3,
+.checklistArea h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+
+    border-bottom: 1px solid #555;
+
+    padding-bottom: 8px;
+}
+
+#taskDescriptionInput {
+    width: 100%;
+    flex: 1;
+
+    background: #333;
+    color: white;
+
+    border: 1px solid #666;
+    border-radius: 6px;
+
+    padding: 10px;
+
+    resize: none;
+
+    box-sizing: border-box;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+
+    border-bottom: 1px solid #555;
+    padding-bottom: 15px;
+}
+
+.modalHeader h2 {
+    margin: 0;
+}
+
+#closeModalButton {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #444;
+    color: white;
+
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#closeModalButton:hover {
+    background: #666;
+}
+
+#deleteTaskButton {
+    height: 40px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #a33;
+    color: white;
+
+    padding: 0 15px;
+
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+#deleteTaskButton:hover {
+    background: #c44;
+}
+
+.taskProgress {
+    width: 60px;
+    text-align: right;
+    font-weight: bold;
+}
+
+#taskNameInput {
+    width: 200px;
+
+    background: transparent;
+    color: white;
+
+    border: none;
+    border-bottom: 1px solid #666;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    outline: none;
+}
+
+.deleteChecklistButton {
+    border: none;
+    background: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 5px;
+}
+
+.deleteChecklistButton,
+#cancelChecklistButton {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    padding: 0 5px;
+}
+
+.taskGhost {
+    opacity: 1;
+}
+
+.sortable-fallback {
+    display: none !important;
+}
+
+#addChecklistButton {
+    color: white;
+    background: transparent;
+    border: none;
+}
+
+.addChecklistItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.addChecklistItem input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+#saveChecklistButton,
+#cancelChecklistButton,
+.deleteChecklistButton,
+#addChecklistButton {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: white;
+}
+
+#cancelChecklistButton {
+    margin-left: 0;
+}
+
+.addChecklistItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.addChecklistItem input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid currentColor;
+    outline: none;
+    padding: 2px 0;
+    color: white;
+}
+
+#cancelChecklistButton {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    color: white;
+}
