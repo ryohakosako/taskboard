@@ -129,8 +129,25 @@ function renderTaskDetail(selectedTask) {
     `;
 
     document.getElementById("taskDescriptionView").innerHTML = `
-        <textarea id="taskDescriptionInput">${selectedTask.description}</textarea>
-    `;
+    <textarea id="taskDescriptionInput">${selectedTask.description}</textarea>
+`;
+
+const descriptionInput =
+    document.getElementById("taskDescriptionInput");
+
+function resizeDescription() {
+    descriptionInput.style.height = "auto";
+    descriptionInput.style.height =
+        descriptionInput.scrollHeight + "px";
+}
+
+resizeDescription();
+
+descriptionInput.addEventListener("input", function () {
+    resizeDescription();
+    selectedTask.description = this.value;
+    saveData();
+});
 
     const nameInput =
         document.getElementById("taskNameInput");

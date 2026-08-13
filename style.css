@@ -179,6 +179,7 @@ h1 {
 #taskDescriptionInput {
     width: 100%;
     flex: 1;
+    min-height: 100px;
 
     background: #333;
     color: white;
@@ -191,6 +192,7 @@ h1 {
     resize: none;
 
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .modalHeader {
