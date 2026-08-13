@@ -80,19 +80,22 @@ function createTaskList() {
                 : "";
 
         const nextItems =
-            getNextChecklist(task);
+    getNextChecklist(task);
 
-        const nextHtml =
-    nextItems
-        .map(item => `
+const item =
+    nextItems[0];
+
+const nextHtml =
+    item
+        ? `
             <span
                 class="taskCheckItem"
                 data-task-id="${task.id}"
                 data-check-id="${item.id}">
                 □ ${item.text}
             </span>
-        `)
-        .join("");
+        `
+        : "";
 
         html += `
         <div class="task ${selectedClass}" data-id="${task.id}">
