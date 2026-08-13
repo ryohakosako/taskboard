@@ -1,3 +1,7 @@
+let tasks = {
+    children: []
+};
+
 let nextId = 1;
 let selectedTaskId = null;
 let showChecklistInput = false;
@@ -818,7 +822,6 @@ const savedData =
     localStorage.getItem("creativeTasks");
 
 if (savedData) {
-
     tasks = JSON.parse(savedData);
 }
 
