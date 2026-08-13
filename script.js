@@ -138,8 +138,7 @@ const descriptionInput =
 function resizeDescription() {
     descriptionInput.style.height = "auto";
 
-    const maxHeight =
-        window.innerHeight * 0.6;
+    const maxHeight = window.innerHeight * 0.6;
 
     descriptionInput.style.height =
         Math.min(descriptionInput.scrollHeight, maxHeight) + "px";
@@ -186,9 +185,6 @@ descriptionInput.addEventListener("input", function () {
         }
 
     });
-
-    const descriptionInput =
-        document.getElementById("taskDescriptionInput");
 
     descriptionInput.addEventListener("blur", function () {
 
