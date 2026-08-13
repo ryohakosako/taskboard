@@ -128,7 +128,7 @@ function renderTaskDetail(selectedTask) {
         <span>${progress}%</span>
     `;
 
-    document.getElementById("taskDescriptionView").innerHTML = `
+document.getElementById("taskDescriptionView").innerHTML = `
     <textarea id="taskDescriptionInput">${selectedTask.description}</textarea>
 `;
 
@@ -137,15 +137,21 @@ const descriptionInput =
 
 function resizeDescription() {
     descriptionInput.style.height = "auto";
+
+    const maxHeight =
+        window.innerHeight * 0.6;
+
     descriptionInput.style.height =
-        descriptionInput.scrollHeight + "px";
+        Math.min(descriptionInput.scrollHeight, maxHeight) + "px";
 }
 
 resizeDescription();
 
 descriptionInput.addEventListener("input", function () {
     resizeDescription();
+
     selectedTask.description = this.value;
+
     saveData();
 });
 

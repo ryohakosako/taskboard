@@ -353,7 +353,6 @@ h1 {
 }
 
 #taskDescriptionView {
-    min-height: 300px;
-    width: 100%;
-    box-sizing: border-box;
+    flex: 1;
+    min-height: 0;
 }
