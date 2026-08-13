@@ -349,3 +349,9 @@ h1 {
     box-shadow: none;
     color: white;
 }
+
+#taskDescriptionView {
+    min-height: 300px;
+    width: 100%;
+    box-sizing: border-box;
+}
