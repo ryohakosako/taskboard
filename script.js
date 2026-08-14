@@ -80,14 +80,14 @@ function createTaskList() {
                 : "";
 
         const nextItems =
-    getNextChecklist(task);
+            getNextChecklist(task);
 
-const item =
-    nextItems[0];
+        const item =
+            nextItems[0];
 
-const nextHtml =
-    item
-        ? `
+        const nextHtml =
+            item
+                ? `
             <span
                 class="taskCheckItem"
                 data-task-id="${task.id}"
@@ -95,7 +95,7 @@ const nextHtml =
                 □ ${item.text}
             </span>
         `
-        : "";
+                : "";
 
         html += `
         <div class="task ${selectedClass}" data-id="${task.id}">
@@ -131,17 +131,17 @@ function renderTaskDetail(selectedTask) {
         <span>${progress}%</span>
     `;
 
-document.getElementById("taskDescriptionView").innerHTML = `
+    document.getElementById("taskDescriptionView").innerHTML = `
     <textarea id="taskDescriptionInput">${selectedTask.description}</textarea>
 `;
 
-const descriptionInput =
-    document.getElementById("taskDescriptionInput");
+    const descriptionInput =
+        document.getElementById("taskDescriptionInput");
 
-descriptionInput.addEventListener("input", function () {
-    selectedTask.description = this.value;
-    saveData();
-});
+    descriptionInput.addEventListener("input", function () {
+        selectedTask.description = this.value;
+        saveData();
+    });
 
     const nameInput =
         document.getElementById("taskNameInput");
@@ -259,7 +259,7 @@ function createChecklistView(task) {
 
     if (showChecklistInput) {
 
-    checklistHtml += `
+        checklistHtml += `
 
     <div class="checkItem addChecklistItem">
 
@@ -276,11 +276,11 @@ function createChecklistView(task) {
 
     `;
 
-}
+    }
 
     if (!showChecklistInput) {
 
-    checklistHtml += `
+        checklistHtml += `
 
         <button id="addChecklistButton">
             ＋
@@ -288,7 +288,7 @@ function createChecklistView(task) {
 
     `;
 
-}
+    }
 
     return checklistHtml;
 
