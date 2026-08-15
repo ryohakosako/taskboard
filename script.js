@@ -601,9 +601,29 @@ function initializeModal() {
     const closeButton = document.getElementById("closeModalButton");
 
     closeButton.addEventListener("click", function () {
+
+        const selectedTask =
+            findTask(tasks, selectedTaskId);
+
+        if (selectedTask && editingChecklistId !== null) {
+
+            const input =
+                document.querySelector(".editChecklistInput");
+
+            if (input) {
+                saveChecklistEdit(
+                    input,
+                    selectedTask
+                );
+            }
+        }
+
+        saveData();
+
         closeTaskModal();
 
         renderTree();
+
     });
 
     const deleteButton = document.getElementById("deleteTaskButton");
