@@ -437,6 +437,10 @@ function bindChecklistDragEvents(selectedTask) {
     checklistSortable = new Sortable(list, {
 
         animation: 150,
+        
+        filter: ".editChecklistInput",
+
+        preventOnFilter: false,
 
         onEnd: function (evt) {
 
