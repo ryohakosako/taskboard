@@ -57,7 +57,6 @@ h1 {
 
 .taskChecks {
     flex: 1;
-    cursor: default;
     user-select: none;
     display: flex;
     gap: 20px;
@@ -81,6 +80,10 @@ h1 {
     width: 100%;
     color: #ddd;
     min-height: 1.5em;
+    padding: 5px 0;
+    box-sizing: border-box;
+    cursor: text;
+    gap: 5px;
 }
 
 .checkItem:hover {
@@ -89,22 +92,28 @@ h1 {
 
 .checkMark {
     flex-shrink: 0;
-    cursor: default;
-    margin-right: 6px;
+    margin-right: 4px;
+    font-size: 18px;
+}
+
+.checkMark,
+.deleteChecklistButton {
+    cursor: pointer;
 }
 
 .checkText {
     display: block;
     flex: 1;
     min-height: 20px;
-    cursor: default;
 }
 
 .checkText,
 .editChecklistInput {
     flex: 1;
     font: inherit;
-    line-height: inherit;
+    font-size: 16px;
+    line-height: 1.6;
+    cursor: pointer;
 }
 
 .editChecklistInput {
@@ -189,7 +198,7 @@ h1 {
 
     background: #333;
     border-radius: 10px;
-    padding: 15px;
+    padding: 18px;
 
     min-height: 0;
 }
@@ -217,9 +226,10 @@ h1 {
     margin-top: 0;
     margin-bottom: 15px;
 
-    border-bottom: 1px solid #555;
+    border-bottom: 2px solid #555;
 
     padding-bottom: 8px;
+    font-size: 18px;
 }
 
 #checklistProgress {
@@ -247,6 +257,9 @@ h1 {
     box-sizing: border-box;
 
     overflow: hidden;
+    line-height: 1.6;
+
+    font-size: 16px;
 }
 
 .modalHeader {
@@ -265,8 +278,8 @@ h1 {
 }
 
 #closeModalButton {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
 
     border: none;
     border-radius: 6px;
@@ -274,7 +287,7 @@ h1 {
     background: #444;
     color: white;
 
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
 }
 
@@ -283,15 +296,14 @@ h1 {
 }
 
 #deleteTaskButton {
-    height: 40px;
+    height: 34px;
+    padding: 0 12px;
 
     border: none;
     border-radius: 6px;
 
     background: #a33;
     color: white;
-
-    padding: 0 15px;
 
     cursor: pointer;
     margin-right: 8px;
@@ -328,8 +340,8 @@ h1 {
     background: none;
     color: white;
     cursor: pointer;
-    font-size: 18px;
-    padding: 0 5px;
+    font-size: 20px;
+    padding: 0 7px;
 }
 
 .deleteChecklistButton,
@@ -366,6 +378,7 @@ h1 {
     background: transparent;
     border: none;
     outline: none;
+    cursor: text;
 }
 
 #saveChecklistButton,
@@ -380,6 +393,7 @@ h1 {
 
 #cancelChecklistButton {
     margin-left: 0;
+    cursor: pointer;
 }
 
 .addChecklistItem {
@@ -432,4 +446,25 @@ h1 {
     color: white;
     cursor: pointer;
     font-size: 26px;
+}
+
+#addChecklistButton,
+#cancelChecklistButton,
+.deleteChecklistButton {
+    font-size: 20px;
+}
+
+.task,
+.taskTitle,
+.taskCheckItem,
+.taskCheckMark,
+.taskCheckText {
+    cursor: pointer;
+}
+
+.editChecklistInput,
+#taskNameInput,
+#taskDescriptionInput,
+#newChecklistText {
+    cursor: text;
 }
