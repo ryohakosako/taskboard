@@ -441,9 +441,9 @@ function bindChecklistDragEvents(selectedTask) {
 
         animation: 150,
 
-        filter: ".editChecklistInput",
+        filter: ".editChecklistInput, #newChecklistText",
 
-        preventOnFilter: false,
+        preventOnFilter: true,
 
         onEnd: function (evt) {
 
@@ -533,8 +533,6 @@ function bindChecklistAddEvents(selectedTask) {
 
             renderTree();
 
-            document.getElementById("newChecklistText").focus();
-
         });
 
     }
@@ -551,7 +549,6 @@ function bindChecklistAddEvents(selectedTask) {
 
     function saveNewChecklist() {
 
-        // すでに保存済みなら何もしない
         if (saved) {
             return;
         }
@@ -560,6 +557,11 @@ function bindChecklistAddEvents(selectedTask) {
             input.value.trim();
 
         if (text === "") {
+
+            showChecklistInput = false;
+
+            renderTree();
+
             return;
         }
 
@@ -592,7 +594,7 @@ function bindChecklistAddEvents(selectedTask) {
     });
 
     // 入力欄から外れたら保存
-    input.addEventListener("blur", function () {
+    input.addEventListener("focusout", function () {
 
         saveNewChecklist();
 
@@ -863,6 +865,17 @@ function renderTree() {
         bindChecklistEvents(selectedTask);
 
         openTaskModal();
+
+        if (showChecklistInput) {
+
+            const input =
+                document.getElementById("newChecklistText");
+
+            if (input) {
+                input.focus();
+            }
+
+        }
 
     }
     else {
