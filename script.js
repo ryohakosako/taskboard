@@ -3,6 +3,7 @@ let tasks = {
 };
 
 let nextId = 1;
+let nextChecklistId = 1;
 let selectedTaskId = null;
 let showChecklistInput = false;
 let editingChecklistId = null;
@@ -468,9 +469,9 @@ function bindChecklistAddEvents(selectedTask) {
         saved = true;
 
         selectedTask.checklist.push({
-            id: nextId++,
+            id: nextChecklistId++,
             text: text,
-            done: false,
+            done: false
         });
 
         showChecklistInput = false;
