@@ -20,6 +20,7 @@ h1 {
 }
 
 .task {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -27,6 +28,19 @@ h1 {
     margin: 5px;
     background: #444;
     border-radius: 8px;
+    overflow: hidden;
+}
+
+.task::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--progress);
+    background: #7ff183;
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .taskTitle {
@@ -34,9 +48,11 @@ h1 {
     min-width: 0;
 }
 
-.task.selected {
-    background-color: #4caf50;
-    color: white;
+.taskTitle,
+.taskChecks,
+.taskProgress {
+    position: relative;
+    z-index: 1;
 }
 
 .taskChecks {

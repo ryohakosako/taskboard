@@ -98,7 +98,10 @@ function createTaskList() {
                 : "";
 
         html += `
-        <div class="task ${selectedClass}" data-id="${task.id}">
+        <div
+            class="task ${selectedClass}"
+            data-id="${task.id}"
+            style="--progress: ${progress}%">
 
             <span class="taskTitle">
                 ${task.name}
@@ -437,7 +440,7 @@ function bindChecklistDragEvents(selectedTask) {
     checklistSortable = new Sortable(list, {
 
         animation: 150,
-        
+
         filter: ".editChecklistInput",
 
         preventOnFilter: false,
