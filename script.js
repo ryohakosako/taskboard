@@ -500,6 +500,8 @@ function bindChecklistAddEvents(selectedTask) {
 
             renderTree();
 
+            document.getElementById("newChecklistText").focus();
+
         });
 
     }
