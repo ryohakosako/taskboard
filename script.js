@@ -147,11 +147,19 @@ function renderTaskDetail(selectedTask) {
 
     function resizeDescription() {
 
-        descriptionInput.style.height = "auto";
+    descriptionInput.style.height = "100px";
 
-        descriptionInput.style.height =
-            descriptionInput.scrollHeight + "px";
-    }
+    requestAnimationFrame(() => {
+
+        if (descriptionInput.scrollHeight > 100) {
+
+            descriptionInput.style.height =
+                descriptionInput.scrollHeight + "px";
+
+        }
+
+    });
+}
 
     resizeDescription();
 
