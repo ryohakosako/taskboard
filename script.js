@@ -155,6 +155,14 @@ function renderTaskDetail(selectedTask) {
 
     resizeDescription();
 
+    function resizeDescription() {
+        descriptionInput.style.height = "auto";
+        descriptionInput.style.height =
+            descriptionInput.scrollHeight + "px";
+    }
+
+    resizeDescription();
+
     descriptionInput.addEventListener("input", function () {
 
         resizeDescription();
