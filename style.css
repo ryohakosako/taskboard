@@ -74,7 +74,7 @@ h1 {
 .checkMark {
     flex-shrink: 0;
     cursor: default;
-
+    margin-right: 6px;
 }
 
 .checkText {
