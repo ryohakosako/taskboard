@@ -147,27 +147,27 @@ function renderTaskDetail(selectedTask) {
 
     function resizeDescription() {
 
-    const modalContent =
-        document.querySelector(".modalContent");
+        const modalContent =
+            document.querySelector(".modalContent");
 
-    const scrollTop =
-        modalContent.scrollTop;
+        const scrollTop =
+            modalContent.scrollTop;
 
-    descriptionInput.style.height = "100px";
+        descriptionInput.style.height = "100px";
 
-    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
 
-        if (descriptionInput.scrollHeight > 100) {
+            if (descriptionInput.scrollHeight > 100) {
 
-            descriptionInput.style.height =
-                descriptionInput.scrollHeight + "px";
+                descriptionInput.style.height =
+                    descriptionInput.scrollHeight + "px";
 
-        }
+            }
 
-        modalContent.scrollTop = scrollTop;
+            modalContent.scrollTop = scrollTop;
 
-    });
-}
+        });
+    }
 
     resizeDescription();
 
@@ -626,37 +626,85 @@ function bindChecklistDeleteEvents(selectedTask) {
 }
 
 function bindChecklistEditEvents(selectedTask) {
-    // 編集
-    const editInputs = document.querySelectorAll(".editChecklistInput");
+
+    const editInputs =
+        document.querySelectorAll(".editChecklistInput");
+
     editInputs.forEach(input => {
-        // 入力欄に自動フォーカス
+
         input.focus();
-        // カーソルを末尾へ
+
         input.setSelectionRange(
             input.value.length,
             input.value.length
         );
-        // キーボード操作
+
+        function resizeChecklistInput() {
+
+            input.style.height = "auto";
+
+            input.style.height =
+                input.scrollHeight + "px";
+        }
+
+        resizeChecklistInput();
+
+        input.addEventListener("input", function () {
+
+            resizeChecklistInput();
+
+        });
+
         input.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                saveChecklistEdit(this, selectedTask);
+
+            // Alt + Enter → 改行
+            if (event.key === "Enter" && event.altKey) {
+
+                event.preventDefault();
+
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                this.setRangeText(
+                    "\n",
+                    start,
+                    end,
+                    "end"
+                );
+
+                resizeChecklistInput();
+
                 return;
             }
+
+            // Enter → 保存
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                saveChecklistEdit(
+                    this,
+                    selectedTask
+                );
+
+                return;
+            }
+
+            // Escape → キャンセル
             if (event.key === "Escape") {
+
+                event.preventDefault();
+
                 cancelEditing = true;
                 editingChecklistId = null;
+
                 renderTree();
+
                 return;
             }
+
         });
-        // フォーカスが外れたら保存
-        input.addEventListener("blur", function () {
-            if (cancelEditing) {
-                cancelEditing = false;
-                return;
-            }
-            saveChecklistEdit(this, selectedTask);
-        });
+
     });
 }
 

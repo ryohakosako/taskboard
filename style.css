@@ -92,17 +92,35 @@ h1 {
 }
 
 .editChecklistInput {
-    color: inherit;
-    font: inherit;
-    background: transparent;
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 0;
+
+    height: auto;
+    min-height: 1.5em;
+
+    margin: 0;
+    padding: 0;
+
     border: none;
     outline: none;
-    box-sizing: border-box;
-    height: 1.5em;
-    padding: 0;
-    margin: 0;
-    line-height: inherit;
+    background: transparent;
+    color: inherit;
+
     font: inherit;
+    line-height: 1.5;
+
+    resize: none;
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    cursor: text;
+    user-select: text;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 #taskModal {
