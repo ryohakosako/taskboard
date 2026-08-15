@@ -469,15 +469,32 @@ function bindChecklistDragEvents(selectedTask) {
 
 function bindCheckTextEvents(selectedTask) {
 
-    const checkTexts =
-        document.querySelectorAll(".checkText");
+    const checkItems =
+        document.querySelectorAll(".checkItem");
 
-
-    checkTexts.forEach(element => {
+    checkItems.forEach(element => {
 
         element.addEventListener("click", function (event) {
 
             event.stopPropagation();
+
+            // ×ボタンをクリックした場合は編集しない
+            if (
+                event.target.classList.contains(
+                    "deleteChecklistButton"
+                )
+            ) {
+                return;
+            }
+
+            // チェックマークをクリックした場合も編集しない
+            if (
+                event.target.classList.contains(
+                    "checkMark"
+                )
+            ) {
+                return;
+            }
 
             const id =
                 Number(this.dataset.id);
