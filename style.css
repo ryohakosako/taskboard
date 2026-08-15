@@ -475,3 +475,14 @@ h1 {
 #newChecklistText {
     cursor: text;
 }
+
+.modalFooter {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#deleteTaskButton {
+    padding: 5px 12px;
+    cursor: pointer;
+}
