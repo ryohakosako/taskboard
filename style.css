@@ -49,7 +49,7 @@ h1 {
     white-space: nowrap;
     min-width: 0;
     overflow: hidden;
-    
+
 }
 
 .taskProgress {
@@ -61,7 +61,7 @@ h1 {
 
 .checkItem {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     color: #ddd;
     min-height: 1.5em;
@@ -162,6 +162,12 @@ h1 {
     overflow-y: auto;
 }
 
+.checklistArea h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .memoArea h3,
 .checklistArea h3 {
     margin-top: 0;
@@ -170,6 +176,12 @@ h1 {
     border-bottom: 1px solid #555;
 
     padding-bottom: 8px;
+}
+
+#checklistProgress {
+    font-size: 18px;
+    font-weight: normal;
+    word-spacing: 10px;
 }
 
 #taskDescriptionInput {
@@ -250,7 +262,7 @@ h1 {
 }
 
 #taskNameInput {
-    width: 200px;
+    width: 100%;
 
     background: transparent;
     color: white;
@@ -262,6 +274,7 @@ h1 {
     font-weight: bold;
 
     outline: none;
+    box-sizing: border-box;
 }
 
 .deleteChecklistButton {
@@ -354,4 +367,22 @@ h1 {
 
     display: flex;
     flex-direction: column;
+}
+
+#taskName {
+    background: transparent;
+    color: white;
+    border: none;
+    border-bottom: 1px solid #666;
+    outline: none;
+    font-size: 18px;
+    padding: 6px 4px;
+}
+
+#addButton {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 26px;
 }

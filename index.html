@@ -9,10 +9,9 @@
 </head>
 
 <body>
-    <h1>タスクボード</h1>
     <div id="input">
         <input id="taskName" placeholder="タスク名">
-        <button id="addButton">追加</button>
+        <button id="addButton">＋</button>
     </div>
     <div class="main">
         <div id="tree"></div>
@@ -32,7 +31,7 @@
                 </div>
 
             </div>
-            
+
             <div class="modalBody">
 
                 <div class="memoArea">
@@ -45,7 +44,10 @@
 
                 <div class="checklistArea">
 
-                    <h3>チェックリスト</h3>
+                    <h3>
+                        チェックリスト
+                        <span id="checklistProgress"></span>
+                    </h3>
 
                     <div id="checklistView"></div>
 

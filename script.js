@@ -123,13 +123,20 @@ function renderTaskDetail(selectedTask) {
 
     const progress = getProgress(selectedTask);
 
+    const totalCount = selectedTask.checklist.length;
+
+    const doneCount =
+        selectedTask.checklist.filter(item => item.done).length;
+
+    document.getElementById("checklistProgress").textContent =
+        `${progress}%  ${doneCount}/${totalCount}`;
+
     document.getElementById("taskNameView").innerHTML = `
         <input
             id="taskNameInput"
             value="${selectedTask.name}"
         >
-        <span>${progress}%</span>
-    `;
+        `;
 
     document.getElementById("taskDescriptionView").innerHTML = `
     <textarea id="taskDescriptionInput">${selectedTask.description}</textarea>
@@ -824,6 +831,14 @@ document.getElementById("addButton").addEventListener("click", function () {
     renderTree();
 
     document.getElementById("taskName").value = "";
+});
+
+document.getElementById("taskName").addEventListener("keydown", function (event) {
+
+    if (event.key === "Enter") {
+        document.getElementById("addButton").click();
+    }
+
 });
 
 const savedData =
