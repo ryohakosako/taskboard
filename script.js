@@ -480,6 +480,19 @@ function bindChecklistAddEvents(selectedTask) {
         renderTree();
     }
 
+    input.addEventListener("blur", function () {
+
+        if (editingChecklistId === Number(this.dataset.id)) {
+
+            saveChecklistEdit(
+                this,
+                selectedTask
+            );
+
+        }
+
+    });
+
     // Enterで保存
     input.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
