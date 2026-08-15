@@ -245,10 +245,11 @@ function createChecklistView(task) {
                     ${mark}
                 </span>
 
-                <input
-                class="editChecklistInput"
-                data-id="${item.id}"
-                value="${item.text}">
+                <textarea
+                    class="editChecklistInput"
+                    data-id="${item.id}"
+                    rows="1"
+                >${item.text}</textarea>
 
                 <button
                 class="deleteChecklistButton"
@@ -643,8 +644,12 @@ function bindChecklistEditEvents(selectedTask) {
 
             input.style.height = "auto";
 
-            input.style.height =
-                input.scrollHeight + "px";
+            requestAnimationFrame(() => {
+
+                input.style.height =
+                    input.scrollHeight + "px";
+
+            });
         }
 
         resizeChecklistInput();
