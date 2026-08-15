@@ -147,6 +147,12 @@ function renderTaskDetail(selectedTask) {
 
     function resizeDescription() {
 
+    const modalContent =
+        document.querySelector(".modalContent");
+
+    const scrollTop =
+        modalContent.scrollTop;
+
     descriptionInput.style.height = "100px";
 
     requestAnimationFrame(() => {
@@ -157,6 +163,8 @@ function renderTaskDetail(selectedTask) {
                 descriptionInput.scrollHeight + "px";
 
         }
+
+        modalContent.scrollTop = scrollTop;
 
     });
 }
