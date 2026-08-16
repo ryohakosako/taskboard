@@ -381,7 +381,7 @@ function bindChecklistDragEvents(selectedTask) {
     }
 
     checklistSortable = new Sortable(list, {
-        animation: 80,
+        animation: 150,
 
         filter: ".editChecklistInput, #newChecklistText",
 
@@ -765,6 +765,8 @@ function bindTaskDragEvents() {
 
     new Sortable(tree, {
         animation: 150,
+
+        forceFallback: true,
 
         onEnd: function () {
             const elements = tree.querySelectorAll(":scope > .task");
