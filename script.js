@@ -422,6 +422,15 @@ function bindCheckTextEvents(selectedTask) {
 
             const id = Number(this.dataset.id);
 
+            if (editingChecklistId !== null && editingChecklistId !== id) {
+
+                const input = document.querySelector(".editChecklistInput");
+
+                if (input) {
+                    saveChecklistEdit(input, selectedTask);
+                }
+            }
+
             editingChecklistId = id;
 
             renderTree();
