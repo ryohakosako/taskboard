@@ -381,7 +381,7 @@ function bindChecklistDragEvents(selectedTask) {
     }
 
     checklistSortable = new Sortable(list, {
-        animation: 150,
+        animation: 80,
 
         filter: ".editChecklistInput, #newChecklistText",
 
@@ -396,10 +396,13 @@ function bindChecklistDragEvents(selectedTask) {
             const movedItem = selectedTask.checklist.splice(oldIndex, 1)[0];
 
             selectedTask.checklist.splice(newIndex, 0, movedItem);
+            editingChecklistId = null;
 
             saveData();
 
-            renderTree();
+            requestAnimationFrame(() => {
+                renderTree();
+            });
         },
     });
 }
