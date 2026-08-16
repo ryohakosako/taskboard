@@ -370,7 +370,6 @@ function bindCheckMarkEvents(selectedTask) {
 }
 
 function bindChecklistDragEvents(selectedTask) {
-    return;
     const list = document.getElementById("sortableChecklist");
 
     if (!list) {
@@ -386,7 +385,7 @@ function bindChecklistDragEvents(selectedTask) {
 
         filter: ".editChecklistInput, #newChecklistText",
 
-        preventOnFilter: true,
+        preventOnFilter: false,
 
         onEnd: function (evt) {
             const oldIndex = evt.oldIndex;
