@@ -388,8 +388,13 @@ function bindChecklistDragEvents(selectedTask) {
         forceFallback: true,
         preventOnFilter: false,
 
+        onStart: function () {
+            list.classList.add("is-dragging");
+        },
+
 
         onEnd: function (evt) {
+            list.classList.remove("is-dragging");
             const oldIndex = evt.oldIndex;
             const newIndex = evt.newIndex;
 

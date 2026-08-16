@@ -459,6 +459,14 @@ h1 {
     font-size: 25px;
 }
 
+#sortableChecklist.is-dragging .checkItem:hover {
+    background: transparent;
+}
+
+#sortableChecklist.is-dragging .sortable-chosen {
+    background: #555 !important;
+}
+
 .task,
 .taskTitle,
 .taskCheckItem,
