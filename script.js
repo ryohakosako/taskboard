@@ -381,7 +381,7 @@ function bindChecklistDragEvents(selectedTask) {
     }
 
     checklistSortable = new Sortable(list, {
-        animation: 150,
+        animation: 120,
 
         filter: ".editChecklistInput, #newChecklistText",
 
@@ -769,7 +769,7 @@ function bindTaskDragEvents() {
     const tree = document.getElementById("tree");
 
     new Sortable(tree, {
-        animation: 150,
+        animation: 120,
 
         forceFallback: true,
 
