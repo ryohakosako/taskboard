@@ -9,6 +9,7 @@ let editingChecklistId = null;
 let editingOldText = "";
 let cancelEditing = false;
 let checklistSortable = null;
+let editingCursorOffset = null;
 
 function saveData() {
     localStorage.setItem("creativeTasks", JSON.stringify(tasks));
@@ -369,6 +370,7 @@ function bindCheckMarkEvents(selectedTask) {
 }
 
 function bindChecklistDragEvents(selectedTask) {
+    return;
     const list = document.getElementById("sortableChecklist");
 
     if (!list) {
@@ -402,28 +404,33 @@ function bindChecklistDragEvents(selectedTask) {
 }
 
 function bindCheckTextEvents(selectedTask) {
-    const checkItems = document.querySelectorAll(
-        ".checkItem:not(.addChecklistItem)"
-    );
+    const checkTexts = document.querySelectorAll(".checkText");
 
-    checkItems.forEach((element) => {
+    checkTexts.forEach((element) => {
         element.addEventListener("click", function (event) {
             event.stopPropagation();
 
-            // ×ボタンをクリックした場合は編集しない
-            if (event.target.classList.contains("deleteChecklistButton")) {
-                return;
-            }
-
-            // チェックマークをクリックした場合も編集しない
-            if (event.target.classList.contains("checkMark")) {
-                return;
-            }
-
             const id = Number(this.dataset.id);
 
-            if (editingChecklistId !== null && editingChecklistId !== id) {
+            // クリックした文字の位置を取得
+            const range = document.caretRangeFromPoint(
+                event.clientX,
+                event.clientY
+            );
 
+            if (range && range.startContainer.nodeType === Node.TEXT_NODE) {
+                const text = range.startContainer.textContent;
+
+                // HTMLの改行・空白分を除く
+                const leadingSpaces = text.match(/^\s*/)[0].length;
+
+                editingCursorOffset =
+                    Math.max(0, range.startOffset - leadingSpaces);
+            } else {
+                editingCursorOffset = 0;
+            }
+
+            if (editingChecklistId !== null && editingChecklistId !== id) {
                 const input = document.querySelector(".editChecklistInput");
 
                 if (input) {
@@ -536,9 +543,19 @@ function bindChecklistEditEvents(selectedTask) {
     const editInputs = document.querySelectorAll(".editChecklistInput");
 
     editInputs.forEach((input) => {
+
         input.focus();
 
-        input.setSelectionRange(input.value.length, input.value.length);
+        if (editingCursorOffset !== null) {
+            const offset = Math.min(
+                editingCursorOffset,
+                input.value.length
+            );
+
+            input.setSelectionRange(offset, offset);
+
+            editingCursorOffset = null;
+        }
 
         function resizeChecklistInput() {
             input.style.height = "auto";
@@ -701,6 +718,7 @@ function deleteSelectedTask() {
 //画面更新
 
 function renderTree() {
+
     document.getElementById("tree").innerHTML = createTaskList(tasks);
 
     bindTaskEvents();
