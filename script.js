@@ -1,7 +1,6 @@
 let tasks = {
     children: [],
 };
-
 let nextId = 1;
 let nextChecklistId = 1;
 let selectedTaskId = null;
@@ -403,7 +402,9 @@ function bindChecklistDragEvents(selectedTask) {
 }
 
 function bindCheckTextEvents(selectedTask) {
-    const checkItems = document.querySelectorAll(".checkItem");
+    const checkItems = document.querySelectorAll(
+        ".checkItem:not(.addChecklistItem)"
+    );
 
     checkItems.forEach((element) => {
         element.addEventListener("click", function (event) {
@@ -479,19 +480,6 @@ function bindChecklistAddEvents(selectedTask) {
         saveData();
         renderTree();
     }
-
-    input.addEventListener("blur", function () {
-
-        if (editingChecklistId === Number(this.dataset.id)) {
-
-            saveChecklistEdit(
-                this,
-                selectedTask
-            );
-
-        }
-
-    });
 
     // Enterで保存
     input.addEventListener("keydown", function (event) {
