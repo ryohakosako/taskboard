@@ -384,8 +384,6 @@ function bindChecklistDragEvents(selectedTask) {
         animation: 120,
 
         filter: ".editChecklistInput, #newChecklistText",
-
-        forceFallback: true,
         preventOnFilter: false,
 
         onStart: function () {
@@ -395,6 +393,7 @@ function bindChecklistDragEvents(selectedTask) {
 
         onEnd: function (evt) {
             list.classList.remove("is-dragging");
+
             const oldIndex = evt.oldIndex;
             const newIndex = evt.newIndex;
 
@@ -430,7 +429,6 @@ function bindCheckTextEvents(selectedTask) {
             if (range && range.startContainer.nodeType === Node.TEXT_NODE) {
                 const text = range.startContainer.textContent;
 
-                // HTMLの改行・空白分を除く
                 const leadingSpaces = text.match(/^\s*/)[0].length;
 
                 editingCursorOffset =
@@ -770,8 +768,6 @@ function bindTaskDragEvents() {
 
     new Sortable(tree, {
         animation: 120,
-
-        forceFallback: true,
 
         onEnd: function () {
             const elements = tree.querySelectorAll(":scope > .task");
