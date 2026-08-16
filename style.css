@@ -46,6 +46,7 @@ h1 {
 .taskTitle {
     flex: 0 1 200px;
     min-width: 0;
+    font-weight: bold;
 }
 
 .taskTitle,
@@ -482,4 +483,27 @@ h1 {
 #deleteTaskButton {
     padding: 5px 12px;
     cursor: pointer;
+}
+
+#inputBottom {
+    display: flex;
+    align-items: center;
+}
+
+#taskNameBottom {
+    background: transparent;
+    color: white;
+    border: none;
+    border-bottom: 1px solid #666;
+    outline: none;
+    font-size: 18px;
+    padding: 6px 4px;
+}
+
+#addButtonBottom {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 26px;
 }

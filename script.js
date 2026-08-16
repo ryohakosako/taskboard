@@ -793,7 +793,7 @@ document.getElementById("addButton").addEventListener("click", function () {
         return;
     }
 
-    tasks.children.push({
+    tasks.children.unshift({
         id: nextId++,
         name: name,
         description: "",
@@ -805,6 +805,27 @@ document.getElementById("addButton").addEventListener("click", function () {
     renderTree();
 
     document.getElementById("taskName").value = "";
+});
+
+document.getElementById("addButtonBottom").addEventListener("click", function () {
+    const name = document.getElementById("taskNameBottom").value.trim();
+
+    if (name === "") {
+        return;
+    }
+
+    tasks.children.push({
+        id: nextId++,
+        name: name,
+        description: "",
+        checklist: [],
+        children: [],
+    });
+
+    saveData();
+    renderTree();
+
+    document.getElementById("taskNameBottom").value = "";
 });
 
 document.getElementById("taskName").addEventListener("keydown", function (event) {
