@@ -385,7 +385,9 @@ function bindChecklistDragEvents(selectedTask) {
 
         filter: ".editChecklistInput, #newChecklistText",
 
+        forceFallback: true,
         preventOnFilter: false,
+
 
         onEnd: function (evt) {
             const oldIndex = evt.oldIndex;
