@@ -18,12 +18,18 @@
         <div id="tree"></div>
     </div>
 
-    <div id="inputBottom">
-        <input id="taskNameBottom" placeholder="タスク名">
-        <button id="addButtonBottom">＋</button>
+    <div class="bottomArea">
+        <div id="inputBottom">
+            <input id="taskNameBottom" placeholder="タスク名">
+            <button id="addButtonBottom">＋</button>
+        </div>
+
+        <div class="restoreArea">
+            <button id="restoreButton">インポート</button>
+            <input type="file" id="restoreFile" accept=".json" style="display: none;">
+            <button id="backupButton">エクスポート</button>
+        </div>
     </div>
-
-
 
     <div id="taskModal" class="hidden">
 

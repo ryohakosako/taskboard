@@ -841,6 +841,12 @@ document.getElementById("taskName").addEventListener("keydown", function (event)
     }
 });
 
+document.getElementById("taskNameBottom").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        document.getElementById("addButtonBottom").click();
+    }
+});
+
 const savedData = localStorage.getItem("creativeTasks");
 
 if (savedData) {
@@ -877,5 +883,64 @@ if (savedModalOpen === "true" && savedSelectedTaskId !== null) {
     selectedTaskId = Number(savedSelectedTaskId);
 }
 
+document.getElementById("backupButton").addEventListener("click", function () {
+    const data = localStorage.getItem("creativeTasks");
+
+    if (!data) {
+        return;
+    }
+
+    const blob = new Blob([data], {
+        type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "creativeTasks.json";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+});
+
 initializeModal();
 renderTree();
+
+// バックアップから復元
+document.getElementById("restoreButton").addEventListener("click", function () {
+    document.getElementById("restoreFile").click();
+});
+
+document.getElementById("restoreFile").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function () {
+        try {
+            const restoredTasks = JSON.parse(reader.result);
+
+            if (!restoredTasks.children || !Array.isArray(restoredTasks.children)) {
+                alert("正しいバックアップファイルではありません。");
+                return;
+            }
+
+            tasks = restoredTasks;
+
+            saveData();
+            renderTree();
+
+        } catch (error) {
+            alert("バックアップファイルを読み込めませんでした。");
+        }
+    };
+
+    reader.readAsText(file);
+});
