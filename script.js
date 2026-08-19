@@ -585,8 +585,57 @@ function bindChecklistEditEvents(selectedTask) {
         });
 
         input.addEventListener("blur", function () {
-            if (editingChecklistId === Number(this.dataset.id)) {
-                saveChecklistEdit(this, selectedTask, false);
+            if (editingChecklistId !== Number(this.dataset.id)) {
+                return;
+            }
+
+            saveChecklistEdit(this, selectedTask, false);
+
+            const checkItem = this.closest(".checkItem");
+
+            if (checkItem) {
+                const text = document.createElement("span");
+
+                text.className = "checkText";
+                text.dataset.id = this.dataset.id;
+                text.textContent = this.value.trim();
+
+                text.addEventListener("click", function (event) {
+                    event.stopPropagation();
+
+                    const id = Number(this.dataset.id);
+
+                    const range = document.caretRangeFromPoint(
+                        event.clientX,
+                        event.clientY
+                    );
+
+                    if (range && range.startContainer.nodeType === Node.TEXT_NODE) {
+                        const textContent = range.startContainer.textContent;
+
+                        const leadingSpaces =
+                            textContent.match(/^\s*/)[0].length;
+
+                        editingCursorOffset =
+                            Math.max(0, range.startOffset - leadingSpaces);
+                    } else {
+                        editingCursorOffset = 0;
+                    }
+
+                    if (editingChecklistId !== null && editingChecklistId !== id) {
+                        const input = document.querySelector(".editChecklistInput");
+
+                        if (input) {
+                            saveChecklistEdit(input, selectedTask, false);
+                        }
+                    }
+
+                    editingChecklistId = id;
+
+                    renderTree();
+                });
+
+                this.replaceWith(text);
             }
         });
 
