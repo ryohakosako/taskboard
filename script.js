@@ -29,7 +29,7 @@ function findTask(task, id) {
     return task.children.find((child) => child.id == id) || null;
 }
 
-function saveChecklistEdit(input, selectedTask) {
+function saveChecklistEdit(input, selectedTask, shouldRender = true) {
     const id = Number(input.dataset.id);
 
     const item = selectedTask.checklist.find((c) => c.id === id);
@@ -44,7 +44,9 @@ function saveChecklistEdit(input, selectedTask) {
 
     editingChecklistId = null;
 
-    renderTree();
+    if (shouldRender) {
+        renderTree();
+    }
 }
 
 // HTML生成
@@ -445,7 +447,7 @@ function bindCheckTextEvents(selectedTask) {
                 const input = document.querySelector(".editChecklistInput");
 
                 if (input) {
-                    saveChecklistEdit(input, selectedTask);
+                    saveChecklistEdit(input, selectedTask, false);
                 }
             }
 
@@ -582,7 +584,40 @@ function bindChecklistEditEvents(selectedTask) {
             resizeChecklistInput();
         });
 
+        input.addEventListener("blur", function () {
+            if (editingChecklistId === Number(this.dataset.id)) {
+                saveChecklistEdit(this, selectedTask, false);
+            }
+        });
+
         input.addEventListener("keydown", function (event) {
+
+            if (event.key === "Tab" && !event.shiftKey) {
+                event.preventDefault();
+
+                const currentId = Number(this.dataset.id);
+
+                const currentIndex = selectedTask.checklist.findIndex(
+                    item => item.id === currentId
+                );
+
+                if (
+                    currentIndex !== -1 &&
+                    currentIndex < selectedTask.checklist.length - 1
+                ) {
+                    saveChecklistEdit(this, selectedTask, false);
+
+                    editingChecklistId =
+                        selectedTask.checklist[currentIndex + 1].id;
+
+                    renderTree();
+                } else {
+                    saveChecklistEdit(this, selectedTask);
+                }
+
+                return;
+            }
+
             // Alt + Enter → 改行
             if (event.key === "Enter" && event.altKey) {
                 event.preventDefault();
