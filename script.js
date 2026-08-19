@@ -130,6 +130,12 @@ function renderTaskDetail(selectedTask) {
 
     const descriptionInput = document.getElementById("taskDescriptionInput");
 
+    descriptionInput.addEventListener("keydown", function (event) {
+        if (event.key === " ") {
+            event.stopPropagation();
+        }
+    });
+
     function resizeDescription() {
         const modalContent = document.querySelector(".modalContent");
 
@@ -149,8 +155,6 @@ function renderTaskDetail(selectedTask) {
     resizeDescription();
 
     descriptionInput.addEventListener("input", function () {
-        resizeDescription();
-
         selectedTask.description = this.value;
 
         saveData();
