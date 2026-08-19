@@ -656,8 +656,12 @@ function bindChecklistEditEvents(selectedTask) {
                 ) {
                     saveChecklistEdit(this, selectedTask, false);
 
-                    editingChecklistId =
-                        selectedTask.checklist[currentIndex + 1].id;
+                    const nextItem =
+                        selectedTask.checklist[currentIndex + 1];
+
+                    editingChecklistId = nextItem.id;
+
+                    editingCursorOffset = nextItem.text.length;
 
                     renderTree();
                 } else {
