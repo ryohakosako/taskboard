@@ -47,6 +47,7 @@ h1 {
     flex: 0 1 220px;
     min-width: 0;
     font-weight: bold;
+    white-space: normal;
 }
 
 .taskTitle,
