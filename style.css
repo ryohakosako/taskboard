@@ -44,7 +44,7 @@ h1 {
 }
 
 .taskTitle {
-    flex: 0 1 200px;
+    flex: 0 1 220px;
     min-width: 0;
     font-weight: bold;
 }
@@ -62,7 +62,7 @@ h1 {
     display: flex;
     gap: 20px;
     align-items: center;
-    white-space: nowrap;
+    white-space: normal;
     min-width: 0;
     overflow: hidden;
 
