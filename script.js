@@ -136,33 +136,47 @@ function renderTaskDetail(selectedTask) {
         if (event.key === " ") {
             event.stopPropagation();
         }
+
+        if (event.key === "Enter") {
+            const modalContent = document.querySelector(".modalContent");
+            const scrollTop = modalContent.scrollTop;
+
+            requestAnimationFrame(() => {
+                modalContent.scrollTop = scrollTop;
+            });
+        }
     });
 
     function resizeDescription() {
-        const modalContent = document.querySelector(".modalContent");
-
-        const scrollTop = modalContent.scrollTop;
-
         descriptionInput.style.height = "100px";
 
         requestAnimationFrame(() => {
             if (descriptionInput.scrollHeight > 100) {
-                descriptionInput.style.height = descriptionInput.scrollHeight + "px";
+                descriptionInput.style.height =
+                    descriptionInput.scrollHeight + "px";
             }
-
-            modalContent.scrollTop = scrollTop;
         });
     }
 
     resizeDescription();
 
     descriptionInput.addEventListener("input", function () {
+        const modalContent = document.querySelector(".modalContent");
+        const scrollTop = modalContent.scrollTop;
+
         selectedTask.description = this.value;
 
-        this.style.height = "100px";
-        this.style.height = this.scrollHeight + "px";
-
         saveData();
+
+        resizeDescription();
+
+        requestAnimationFrame(() => {
+            modalContent.scrollTop = scrollTop;
+
+            requestAnimationFrame(() => {
+                modalContent.scrollTop = scrollTop;
+            });
+        });
     });
 
     const nameInput = document.getElementById("taskNameInput");
