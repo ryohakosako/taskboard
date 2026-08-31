@@ -159,6 +159,9 @@ function renderTaskDetail(selectedTask) {
     descriptionInput.addEventListener("input", function () {
         selectedTask.description = this.value;
 
+        this.style.height = "100px";
+        this.style.height = this.scrollHeight + "px";
+
         saveData();
     });
 
