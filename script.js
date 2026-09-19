@@ -779,10 +779,27 @@ function initializeModal() {
 
     const modal = document.getElementById("taskModal");
 
-    modal.addEventListener("click", function () {
-        closeTaskModal();
+    let modalMouseDownTarget = null;
 
+    modal.addEventListener("mousedown", function (event) {
+        modalMouseDownTarget = event.target;
+    });
+
+    modal.addEventListener("click", function (event) {
+        // モーダル内からドラッグして外で離した場合は閉じない
+        if (
+            modalMouseDownTarget &&
+            modalMouseDownTarget.closest(".modalContent") &&
+            !event.target.closest(".modalContent")
+        ) {
+            modalMouseDownTarget = null;
+            return;
+        }
+
+        closeTaskModal();
         renderTree();
+
+        modalMouseDownTarget = null;
     });
 
     const modalContent = document.querySelector(".modalContent");
