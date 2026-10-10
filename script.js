@@ -166,6 +166,11 @@ function renderTaskDetail(selectedTask) {
 
     descriptionInput.addEventListener("input", function () {
         const modalContent = document.querySelector(".modalContent");
+
+        const wasAtBottom =
+            modalContent.scrollTop + modalContent.clientHeight >=
+            modalContent.scrollHeight - 5;
+
         const scrollTop = modalContent.scrollTop;
 
         selectedTask.description = this.value;
@@ -174,7 +179,13 @@ function renderTaskDetail(selectedTask) {
         resizeDescription();
 
         requestAnimationFrame(() => {
-            modalContent.scrollTop = scrollTop;
+            requestAnimationFrame(() => {
+                if (wasAtBottom) {
+                    modalContent.scrollTop = modalContent.scrollHeight;
+                } else {
+                    modalContent.scrollTop = scrollTop;
+                }
+            });
         });
     });
 
