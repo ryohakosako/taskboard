@@ -158,7 +158,11 @@ function renderTaskDetail(selectedTask) {
         modalContent.scrollTop = scrollTop;
     }
 
-    resizeDescription();
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            resizeDescription();
+        });
+    });
 
     descriptionInput.addEventListener("input", function () {
         const modalContent = document.querySelector(".modalContent");
