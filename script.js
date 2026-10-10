@@ -133,9 +133,6 @@ function renderTaskDetail(selectedTask) {
     const descriptionInput = document.getElementById("taskDescriptionInput");
 
     descriptionInput.addEventListener("keydown", function (event) {
-        if (event.key === " ") {
-            event.stopPropagation();
-        }
 
         if (event.key === "Enter") {
             const modalContent = document.querySelector(".modalContent");
@@ -166,26 +163,66 @@ function renderTaskDetail(selectedTask) {
 
     descriptionInput.addEventListener("input", function () {
         const modalContent = document.querySelector(".modalContent");
-
-        const wasAtBottom =
-            modalContent.scrollTop + modalContent.clientHeight >=
-            modalContent.scrollHeight - 5;
-
+        const textarea = this;
         const scrollTop = modalContent.scrollTop;
 
-        selectedTask.description = this.value;
+        selectedTask.description = textarea.value;
         saveData();
-
         resizeDescription();
 
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                if (wasAtBottom) {
-                    modalContent.scrollTop = modalContent.scrollHeight;
-                } else {
-                    modalContent.scrollTop = scrollTop;
-                }
+            const style = window.getComputedStyle(textarea);
+            const mirror = document.createElement("div");
+
+            [
+                "boxSizing", "width", "fontFamily", "fontSize",
+                "fontWeight", "fontStyle", "letterSpacing",
+                "textTransform", "textIndent", "lineHeight",
+                "paddingTop", "paddingRight", "paddingBottom",
+                "paddingLeft", "borderTopWidth", "borderRightWidth",
+                "borderBottomWidth", "borderLeftWidth"
+            ].forEach((prop) => {
+                mirror.style[prop] = style[prop];
             });
+
+            Object.assign(mirror.style, {
+                position: "absolute",
+                visibility: "hidden",
+                height: "auto",
+                minHeight: "0",
+                maxHeight: "none",
+                overflow: "hidden",
+                whiteSpace: "pre-wrap",
+                overflowWrap: "break-word"
+            });
+
+            mirror.textContent =
+                textarea.value.substring(0, textarea.selectionStart);
+
+            const marker = document.createElement("span");
+            marker.textContent = "\u200b";
+            mirror.appendChild(marker);
+            document.body.appendChild(mirror);
+
+            const caretY =
+                textarea.getBoundingClientRect().top +
+                marker.getBoundingClientRect().top -
+                mirror.getBoundingClientRect().top;
+
+            mirror.remove();
+
+            const modalRect = modalContent.getBoundingClientRect();
+            const margin = 24;
+
+            if (caretY > modalRect.bottom - margin) {
+                modalContent.scrollTop +=
+                    caretY - modalRect.bottom + margin;
+            } else if (caretY < modalRect.top + margin) {
+                modalContent.scrollTop -=
+                    modalRect.top + margin - caretY;
+            } else {
+                modalContent.scrollTop = scrollTop;
+            }
         });
     });
 
