@@ -133,7 +133,7 @@ function renderTaskDetail(selectedTask) {
     const descriptionInput = document.getElementById("taskDescriptionInput");
 
     descriptionInput.addEventListener("keydown", function (event) {
-        if (event.key === " ") {
+        if (event.code === "Space") {
             event.stopPropagation();
         }
 
