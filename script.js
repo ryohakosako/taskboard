@@ -148,14 +148,14 @@ function renderTaskDetail(selectedTask) {
     });
 
     function resizeDescription() {
-        descriptionInput.style.height = "100px";
+        const modalContent = document.querySelector(".modalContent");
+        const scrollTop = modalContent.scrollTop;
 
-        requestAnimationFrame(() => {
-            if (descriptionInput.scrollHeight > 100) {
-                descriptionInput.style.height =
-                    descriptionInput.scrollHeight + "px";
-            }
-        });
+        descriptionInput.style.height = "100px";
+        descriptionInput.style.height =
+            Math.max(100, descriptionInput.scrollHeight) + "px";
+
+        modalContent.scrollTop = scrollTop;
     }
 
     resizeDescription();
@@ -165,17 +165,12 @@ function renderTaskDetail(selectedTask) {
         const scrollTop = modalContent.scrollTop;
 
         selectedTask.description = this.value;
-
         saveData();
 
         resizeDescription();
 
         requestAnimationFrame(() => {
             modalContent.scrollTop = scrollTop;
-
-            requestAnimationFrame(() => {
-                modalContent.scrollTop = scrollTop;
-            });
         });
     });
 
