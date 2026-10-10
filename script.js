@@ -148,13 +148,14 @@ function renderTaskDetail(selectedTask) {
     });
 
     function resizeDescription() {
-        const modalContent = document.querySelector(".modalContent");
-        const scrollTop = modalContent.scrollTop;
+        descriptionInput.style.height = "100px";
 
-        descriptionInput.style.height = "auto";
-        descriptionInput.style.height = descriptionInput.scrollHeight + "px";
-
-        modalContent.scrollTop = scrollTop;
+        requestAnimationFrame(() => {
+            if (descriptionInput.scrollHeight > 100) {
+                descriptionInput.style.height =
+                    descriptionInput.scrollHeight + "px";
+            }
+        });
     }
 
     resizeDescription();
@@ -164,12 +165,17 @@ function renderTaskDetail(selectedTask) {
         const scrollTop = modalContent.scrollTop;
 
         selectedTask.description = this.value;
+
         saveData();
 
         resizeDescription();
 
         requestAnimationFrame(() => {
             modalContent.scrollTop = scrollTop;
+
+            requestAnimationFrame(() => {
+                modalContent.scrollTop = scrollTop;
+            });
         });
     });
 
