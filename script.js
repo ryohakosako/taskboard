@@ -133,10 +133,9 @@ function renderTaskDetail(selectedTask) {
     const descriptionInput = document.getElementById("taskDescriptionInput");
 
     descriptionInput.addEventListener("keydown", function (event) {
-        if (event.code === "Space") {
+        if (event.key === " ") {
             event.stopPropagation();
         }
-
 
         if (event.key === "Enter") {
             const modalContent = document.querySelector(".modalContent");
@@ -146,17 +145,16 @@ function renderTaskDetail(selectedTask) {
                 modalContent.scrollTop = scrollTop;
             });
         }
-    }, true);
+    });
 
     function resizeDescription() {
-        descriptionInput.style.height = "100px";
+        const modalContent = document.querySelector(".modalContent");
+        const scrollTop = modalContent.scrollTop;
 
-        requestAnimationFrame(() => {
-            if (descriptionInput.scrollHeight > 100) {
-                descriptionInput.style.height =
-                    descriptionInput.scrollHeight + "px";
-            }
-        });
+        descriptionInput.style.height = "auto";
+        descriptionInput.style.height = descriptionInput.scrollHeight + "px";
+
+        modalContent.scrollTop = scrollTop;
     }
 
     resizeDescription();
@@ -166,17 +164,12 @@ function renderTaskDetail(selectedTask) {
         const scrollTop = modalContent.scrollTop;
 
         selectedTask.description = this.value;
-
         saveData();
 
         resizeDescription();
 
         requestAnimationFrame(() => {
             modalContent.scrollTop = scrollTop;
-
-            requestAnimationFrame(() => {
-                modalContent.scrollTop = scrollTop;
-            });
         });
     });
 
