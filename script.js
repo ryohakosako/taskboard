@@ -148,19 +148,33 @@ function renderTaskDetail(selectedTask) {
     });
 
     function resizeDescription() {
-        const modalContent = document.querySelector(".modalContent");
-        const scrollTop = modalContent.scrollTop;
-
         descriptionInput.style.height = "100px";
         descriptionInput.style.height =
             Math.max(100, descriptionInput.scrollHeight) + "px";
-
-        modalContent.scrollTop = scrollTop;
     }
 
-    requestAnimationFrame(() => {
+    resizeDescription();
+
+    descriptionInput.addEventListener("input", function () {
+        const modalContent = document.querySelector(".modalContent");
+
+        const wasAtBottom =
+            modalContent.scrollHeight - modalContent.scrollTop -
+            modalContent.clientHeight <= 30;
+
+        const scrollTop = modalContent.scrollTop;
+
+        selectedTask.description = this.value;
+        saveData();
+
+        resizeDescription();
+
         requestAnimationFrame(() => {
-            resizeDescription();
+            if (wasAtBottom) {
+                modalContent.scrollTop = modalContent.scrollHeight;
+            } else {
+                modalContent.scrollTop = scrollTop;
+            }
         });
     });
 
