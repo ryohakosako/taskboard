@@ -147,18 +147,6 @@ function renderTaskDetail(selectedTask) {
         }
     });
 
-    const modalContent = document.querySelector(".modalContent");
-
-    let descriptionFollowBottom =
-        modalContent.scrollHeight -
-        modalContent.scrollTop -
-        modalContent.clientHeight <= 30;
-
-    modalContent.addEventListener("scroll", function () {
-        descriptionFollowBottom =
-            this.scrollHeight - this.scrollTop - this.clientHeight <= 30;
-    });
-
     function resizeDescription() {
         descriptionInput.style.height = "100px";
         descriptionInput.style.height =
@@ -168,18 +156,26 @@ function renderTaskDetail(selectedTask) {
     resizeDescription();
 
     descriptionInput.addEventListener("input", function () {
-        const shouldFollowBottom = descriptionFollowBottom;
+        const modalContent = document.querySelector(".modalContent");
+
+        const wasAtBottom =
+            modalContent.scrollHeight - modalContent.scrollTop -
+            modalContent.clientHeight <= 30;
+
+        const scrollTop = modalContent.scrollTop;
 
         selectedTask.description = this.value;
         saveData();
 
         resizeDescription();
 
-        if (shouldFollowBottom) {
-            requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (wasAtBottom) {
                 modalContent.scrollTop = modalContent.scrollHeight;
-            });
-        }
+            } else {
+                modalContent.scrollTop = scrollTop;
+            }
+        });
     });
 
     descriptionInput.addEventListener("input", function () {
