@@ -137,6 +137,7 @@ function renderTaskDetail(selectedTask) {
             event.stopPropagation();
         }
 
+
         if (event.key === "Enter") {
             const modalContent = document.querySelector(".modalContent");
             const scrollTop = modalContent.scrollTop;
@@ -145,7 +146,7 @@ function renderTaskDetail(selectedTask) {
                 modalContent.scrollTop = scrollTop;
             });
         }
-    });
+    }, true);
 
     function resizeDescription() {
         descriptionInput.style.height = "100px";
