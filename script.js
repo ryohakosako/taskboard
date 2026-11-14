@@ -1,6 +1,8 @@
 let tasks = {
     children: [],
 };
+let activeColumnId = "column-1";
+let boardSortables = [];
 let nextId = 1;
 let nextChecklistId = 1;
 let selectedTaskId = null;
@@ -11,9 +13,70 @@ let cancelEditing = false;
 let checklistSortable = null;
 let editingCursorOffset = null;
 
+const undoHistory = [];
+const redoHistory = [];
+let savedSnapshot = null;
+
 function saveData() {
-    localStorage.setItem("creativeTasks", JSON.stringify(tasks));
+    normalizeColumns(tasks);
+    const snapshot = JSON.stringify(tasks);
+    if (savedSnapshot !== null && snapshot !== savedSnapshot) {
+        undoHistory.push(savedSnapshot);
+        redoHistory.length = 0;
+    }
+    localStorage.setItem("creativeTasks", snapshot);
+    savedSnapshot = snapshot;
 }
+
+function restoreHistory(from, to) {
+    if (!from.length) return;
+    to.push(savedSnapshot);
+    tasks = JSON.parse(from.pop());
+    savedSnapshot = JSON.stringify(tasks);
+    localStorage.setItem("creativeTasks", savedSnapshot);
+    normalizeColumns(tasks);
+    recalculateIds();
+    editingChecklistId = null;
+    showChecklistInput = false;
+    renderTree();
+}
+
+document.addEventListener("keydown", (event) => {
+    if (!event.ctrlKey || event.altKey || event.isComposing ||
+        event.target.closest("input, textarea, select, [contenteditable]:not([contenteditable='false'])") ||
+        document.getElementById("deleteConfirmation").open) return;
+    const key = event.key.toLowerCase();
+    if (key !== "z" && key !== "y") return;
+    event.preventDefault();
+    if (key === "z") restoreHistory(undoHistory, redoHistory);
+    else restoreHistory(redoHistory, undoHistory);
+});
+
+let pendingDeletion = null;
+let deletionTrigger = null;
+function confirmDeletion(action) {
+    pendingDeletion = action;
+    deletionTrigger = document.activeElement;
+    document.getElementById("deleteConfirmation").showModal();
+    document.getElementById("cancelDeleteButton").focus();
+}
+
+function cancelDeletion() {
+    pendingDeletion = null;
+    document.getElementById("deleteConfirmation").close();
+    if (deletionTrigger?.isConnected) deletionTrigger.focus();
+}
+
+document.getElementById("cancelDeleteButton").addEventListener("click", cancelDeletion);
+document.getElementById("deleteConfirmation").addEventListener("cancel", (event) => {
+    event.preventDefault();
+    cancelDeletion();
+});
+document.getElementById("confirmDeleteButton").addEventListener("click", () => {
+    const action = pendingDeletion;
+    cancelDeletion();
+    action?.();
+});
 
 // データ処理
 
@@ -55,10 +118,10 @@ function getNextChecklist(task, count = 2) {
     return task.checklist.filter((item) => !item.done).slice(0, count);
 }
 
-function createTaskList() {
+function createTaskList(columnId) {
     let html = "";
 
-    for (const task of tasks.children) {
+    for (const task of tasks.children.filter(task => task.columnId === columnId)) {
         const progress = getProgress(task);
 
         const selectedClass = task.id === selectedTaskId ? "selected" : "";
@@ -78,7 +141,7 @@ function createTaskList() {
                 <span class="taskCheckMark">□</span>
 
                 <span class="taskCheckText">
-                    ${item.text}
+                    ${escapeHtml(item.text)}
                 </span>
 
             </span>
@@ -92,7 +155,7 @@ function createTaskList() {
             style="--progress: ${progress}%">
 
             <span class="taskTitle">
-                ${task.name}
+                ${escapeHtml(task.name)}
             </span>
 
             <span class="taskChecks">
@@ -122,12 +185,12 @@ function renderTaskDetail(selectedTask) {
     document.getElementById("taskNameView").innerHTML = `
         <input
             id="taskNameInput"
-            value="${selectedTask.name}"
+            value="${escapeHtml(selectedTask.name)}"
         >
         `;
 
     document.getElementById("taskDescriptionView").innerHTML = `
-    <textarea id="taskDescriptionInput">${selectedTask.description}</textarea>
+    <textarea id="taskDescriptionInput">${escapeHtml(selectedTask.description)}</textarea>
 `;
 
     const descriptionInput = document.getElementById("taskDescriptionInput");
@@ -286,7 +349,7 @@ function createChecklistView(task) {
                     class="editChecklistInput"
                     data-id="${item.id}"
                     rows="1"
-                >${item.text}</textarea>
+                >${escapeHtml(item.text)}</textarea>
 
                 <button
                 class="deleteChecklistButton"
@@ -311,7 +374,7 @@ function createChecklistView(task) {
                 <span
                 class="checkText"
                 data-id="${item.id}">
-                    ${item.text}
+                    ${escapeHtml(item.text)}
                 </span>
 
                 <button
@@ -609,9 +672,11 @@ function bindChecklistDeleteEvents(selectedTask) {
         button.addEventListener("click", function (event) {
             event.stopPropagation();
             const id = Number(this.dataset.id);
-            selectedTask.checklist = selectedTask.checklist.filter((item) => item.id !== id);
-            saveData();
-            renderTree();
+            confirmDeletion(() => {
+                selectedTask.checklist = selectedTask.checklist.filter((item) => item.id !== id);
+                saveData();
+                renderTree();
+            });
         });
     });
 }
@@ -821,7 +886,7 @@ function initializeModal() {
     deleteButton.addEventListener("click", function (event) {
         event.stopPropagation();
 
-        deleteSelectedTask();
+        confirmDeletion(deleteSelectedTask);
     });
 
     const modal = document.getElementById("taskModal");
@@ -855,7 +920,7 @@ function initializeModal() {
         event.stopPropagation();
     });
     document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && !document.getElementById("deleteConfirmation").open && !event.defaultPrevented) {
             closeTaskModal();
 
             renderTree();
@@ -899,7 +964,7 @@ function deleteSelectedTask() {
 
 function renderTree() {
 
-    document.getElementById("tree").innerHTML = createTaskList(tasks);
+    renderColumns();
 
     bindTaskEvents();
 
@@ -936,35 +1001,107 @@ function renderTree() {
     }
 }
 
-function bindTaskDragEvents() {
+function normalizeColumns(data) {
+    if (!Array.isArray(data.columns) || !data.columns.length) {
+        data.columns = [{ id: "column-1", name: "タスクボード" }];
+    }
+    const ids = new Set(data.columns.map(column => column.id));
+    for (const task of data.children) {
+        if (!ids.has(task.columnId)) task.columnId = data.columns[0].id;
+    }
+    if (!ids.has(activeColumnId)) activeColumnId = data.columns[0].id;
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[char]));
+}
+
+function renderColumns() {
+    boardSortables.forEach(sortable => sortable.destroy());
+    boardSortables = [];
     const tree = document.getElementById("tree");
-
-    new Sortable(tree, {
-        animation: 120,
-
-        onEnd: function () {
-            const elements = tree.querySelectorAll(":scope > .task");
-
-            const newChildren = [];
-
-            elements.forEach((element) => {
-                const id = Number(element.dataset.id);
-
-                const task = findTask(tasks, id);
-
-                if (task) {
-                    newChildren.push(task);
-                }
-            });
-
-            // 並び替えた順番をtasks.childrenに反映
-            tasks.children = newChildren;
-
-            // 保存
+    tree.innerHTML = tasks.columns.map(column =>
+        '<section class="boardColumn" data-column-id="' + escapeHtml(column.id) + '">' +
+        '<header class="columnHeader"><span class="columnDragHandle" title="列を移動" aria-label="列を移動">⠿</span>' +
+        '<input class="columnName" aria-label="列名" value="' + escapeHtml(column.name) + '">' +
+        '<button class="deleteColumnButton" title="列と中のタスクを削除" aria-label="列と中のタスクを削除">×</button></header>' +
+        '<div class="columnTasks" data-column-id="' + escapeHtml(column.id) + '">' + createTaskList(column.id) + '</div></section>'
+    ).join("");
+    const select = document.getElementById("targetColumn");
+    select.innerHTML = tasks.columns.map(column => '<option value="' + escapeHtml(column.id) + '">' + escapeHtml(column.name) + '</option>').join("");
+    select.value = activeColumnId;
+    tree.querySelectorAll(".boardColumn").forEach(section => {
+        const column = tasks.columns.find(column => column.id === section.dataset.columnId);
+        const input = section.querySelector(".columnName");
+        input.addEventListener("change", () => {
+            const name = input.value.trim();
+            if (!name) { input.value = column.name; return; }
+            column.name = name;
             saveData();
-        },
+            renderTree();
+        });
+        input.addEventListener("keydown", event => {
+            if (event.key === "Enter") input.blur();
+            if (event.key === "Escape") { input.value = column.name; input.blur(); }
+        });
+        section.querySelector(".deleteColumnButton").addEventListener("click", () => {
+            confirmDeletion(() => {
+                tasks.children = tasks.children.filter(task => task.columnId !== column.id);
+                tasks.columns = tasks.columns.filter(item => item.id !== column.id);
+                normalizeColumns(tasks);
+                saveData();
+                renderTree();
+            });
+        });
     });
 }
+
+function bindTaskDragEvents() {
+    const tree = document.getElementById("tree");
+    boardSortables.push(new Sortable(tree, {
+        animation: 120, draggable: ".boardColumn", handle: ".columnDragHandle",
+        onEnd() {
+            const columns = new Map(tasks.columns.map(column => [column.id, column]));
+            tasks.columns = [...tree.querySelectorAll(":scope > .boardColumn")].map(section => columns.get(section.dataset.columnId));
+            saveData();
+        }
+    }));
+    tree.querySelectorAll(".columnTasks").forEach(list => {
+        boardSortables.push(new Sortable(list, {
+            group: "board-tasks", animation: 120, draggable: ".task",
+            onEnd() {
+                const byId = new Map(tasks.children.map(task => [String(task.id), task]));
+                const ordered = [];
+                tree.querySelectorAll(".columnTasks").forEach(container => {
+                    container.querySelectorAll(":scope > .task").forEach(element => {
+                        const task = byId.get(element.dataset.id);
+                        task.columnId = container.dataset.columnId;
+                        ordered.push(task);
+                    });
+                });
+                tasks.children = ordered;
+                saveData();
+            }
+        }));
+    });
+}
+
+document.getElementById("targetColumn").addEventListener("change", event => {
+    activeColumnId = event.target.value;
+});
+document.getElementById("addColumnButton").addEventListener("click", () => {
+    const column = {id: "column-" + crypto.randomUUID(), name: "新しい列"};
+    tasks.columns.push(column);
+    activeColumnId = column.id;
+    saveData();
+    renderTree();
+    const last = document.querySelector(".boardColumn:last-child");
+    last.scrollIntoView({block: "nearest", inline: "end", behavior: "smooth"});
+    last.querySelector(".columnName").focus({preventScroll: true});
+    last.querySelector(".columnName").select();
+});
 
 document.getElementById("addButton").addEventListener("click", function () {
     const name = document.getElementById("taskName").value.trim();
@@ -974,6 +1111,7 @@ document.getElementById("addButton").addEventListener("click", function () {
     }
 
     tasks.children.unshift({
+        columnId: activeColumnId,
         id: nextId++,
         name: name,
         description: "",
@@ -995,6 +1133,7 @@ document.getElementById("addButtonBottom").addEventListener("click", function ()
     }
 
     tasks.children.push({
+        columnId: activeColumnId,
         id: nextId++,
         name: name,
         description: "",
@@ -1026,27 +1165,15 @@ if (savedData) {
     tasks = JSON.parse(savedData);
 }
 
-let maxId = 0;
-
-for (const task of tasks.children) {
-    if (task.id > maxId) {
-        maxId = task.id;
-    }
+function recalculateIds() {
+    nextId = Math.max(0, ...tasks.children.map(task => Number(task.id) || 0)) + 1;
+    nextChecklistId = Math.max(0, ...tasks.children.flatMap(task =>
+        task.checklist.map(item => Number(item.id) || 0))) + 1;
 }
-
-nextId = maxId + 1;
-
-let maxChecklistId = 0;
-
-for (const task of tasks.children) {
-    for (const item of task.checklist) {
-        if (item.id > maxChecklistId) {
-            maxChecklistId = item.id;
-        }
-    }
-}
-
-nextChecklistId = maxChecklistId + 1;
+normalizeColumns(tasks);
+recalculateIds();
+localStorage.setItem("creativeTasks", JSON.stringify(tasks));
+savedSnapshot = JSON.stringify(tasks);
 
 const savedModalOpen = localStorage.getItem("modalOpen");
 
@@ -1106,6 +1233,8 @@ document.getElementById("restoreFile").addEventListener("change", function (even
             }
 
             tasks = restoredTasks;
+            normalizeColumns(tasks);
+            recalculateIds();
 
             saveData();
             renderTree();

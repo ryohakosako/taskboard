@@ -10,12 +10,14 @@
 
 <body>
     <div id="input">
+        <select id="targetColumn" aria-label="タスクの追加先の列"></select>
         <input id="taskName" placeholder="タスク名">
         <button id="addButton">＋</button>
     </div>
 
     <div class="main">
         <div id="tree"></div>
+        <button id="addColumnButton" type="button" aria-label="列を追加" title="列を追加">＋</button>
     </div>
 
     <div class="bottomArea">
@@ -63,6 +65,13 @@
         </div>
 
     </div>
+    <dialog id="deleteConfirmation" aria-labelledby="deleteConfirmationMessage">
+        <p id="deleteConfirmationMessage">削除しますか？</p>
+        <div class="confirmationActions">
+            <button id="confirmDeleteButton" type="button">削除</button>
+            <button id="cancelDeleteButton" type="button">キャンセル</button>
+        </div>
+    </dialog>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="script.js"></script>
 
