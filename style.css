@@ -583,3 +583,15 @@ h1 {
     font: 16px/1.6 sans-serif; cursor: text;
 }
 #taskDescriptionPreview[hidden], #taskDescriptionInput[hidden] { display: none; }
+
+#sortableChecklist .checkItem { cursor: grab; }
+#sortableChecklist .checkText { cursor: grab; }
+#sortableChecklist .editChecklistInput { cursor: text; }
+#sortableChecklist .checklistGrabbed { background: #484848; outline: 1px solid #888; border-radius: 5px; }
+#sortableChecklist .checklistDropTarget { background: #344b5e; outline: 2px dashed #8cc7ff; border-radius: 5px; opacity: .55; }
+.checklistDragPreview.sortable-fallback {
+    display: flex !important; background: #555; color: #fff;
+    border: 1px solid #aaa; border-radius: 5px;
+    box-shadow: 0 6px 18px #0008; opacity: .9; cursor: grabbing; pointer-events: none;
+}
+#sortableChecklist.is-dragging, #sortableChecklist.is-dragging .checkText { cursor: grabbing; }

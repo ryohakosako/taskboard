@@ -624,7 +624,21 @@ function bindChecklistDragEvents(selectedTask) {
     checklistSortable = new Sortable(list, {
         animation: 120,
 
-        filter: ".checkText, a, .editChecklistInput, #newChecklistText",
+        draggable: ".checkItem",
+        filter: function (event) {
+            // 編集・リンク・ボタンはクリック優先。Shift付きなら表示テキストも選択できる。
+            return Boolean(event.target.closest("input, textarea, button, a, [contenteditable]:not([contenteditable='false'])") ||
+                (event.shiftKey && event.target.closest(".checkText")));
+        },
+        forceFallback: true,
+        fallbackTolerance: 5,
+        delay: 120,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 5,
+        ghostClass: "checklistDropTarget",
+        chosenClass: "checklistGrabbed",
+        dragClass: "checklistDragging",
+        fallbackClass: "checklistDragPreview",
         preventOnFilter: false,
 
         onStart: function () {
@@ -635,8 +649,11 @@ function bindChecklistDragEvents(selectedTask) {
         onEnd: function (evt) {
             list.classList.remove("is-dragging");
 
-            const oldIndex = evt.oldIndex;
-            const newIndex = evt.newIndex;
+            const oldIndex = evt.oldDraggableIndex ?? evt.oldIndex;
+            const newIndex = evt.newDraggableIndex ?? evt.newIndex;
+            if (!Number.isInteger(oldIndex) || !Number.isInteger(newIndex) ||
+                oldIndex === newIndex || oldIndex < 0 || newIndex < 0 ||
+                oldIndex >= selectedTask.checklist.length || newIndex >= selectedTask.checklist.length) return;
 
             const movedItem = selectedTask.checklist.splice(oldIndex, 1)[0];
 
@@ -1042,6 +1059,15 @@ function initializeModal() {
         event.stopPropagation();
     });
     document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.defaultPrevented && !event.isComposing &&
+            event.keyCode !== 229 && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey &&
+            !modal.classList.contains("hidden") && selectedTaskId !== null &&
+            !document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]:not(#taskModal):not([hidden])') &&
+            !event.target.closest('input, textarea, select, button, a, [contenteditable]:not([contenteditable="false"])')) {
+            event.preventDefault();
+            closeButton.click();
+            return;
+        }
         if (event.key === "Escape" && !document.getElementById("deleteConfirmation").open && !event.defaultPrevented) {
             closeTaskModal();
 
