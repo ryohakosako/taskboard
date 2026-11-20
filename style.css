@@ -572,3 +572,14 @@ h1 {
 .columnTasks { flex: 1; min-height: 100px; }
 #targetColumn { background: #333; color: white; border: 1px solid #666; border-radius: 4px; padding: 6px; max-width: 180px; }
 @media (max-width: 640px) { .boardColumn { flex-basis: 85vw; min-width: 85vw; } body { margin: 15px; } }
+
+.textLink { color: #8cc7ff; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.textLink:hover { color: #c3e2ff; }
+.textLink:focus-visible { outline: 2px solid #8cc7ff; outline-offset: 2px; }
+#taskDescriptionPreview {
+    min-height: 100px; box-sizing: border-box; padding: 10px;
+    border: 1px solid #666; border-radius: 6px; color: white;
+    white-space: pre-wrap; overflow-wrap: anywhere;
+    font: 16px/1.6 sans-serif; cursor: text;
+}
+#taskDescriptionPreview[hidden], #taskDescriptionInput[hidden] { display: none; }

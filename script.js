@@ -141,7 +141,7 @@ function createTaskList(columnId) {
                 <span class="taskCheckMark">□</span>
 
                 <span class="taskCheckText">
-                    ${escapeHtml(item.text)}
+                    ${linkifyText(item.text)}
                 </span>
 
             </span>
@@ -190,7 +190,8 @@ function renderTaskDetail(selectedTask) {
         `;
 
     document.getElementById("taskDescriptionView").innerHTML = `
-    <textarea id="taskDescriptionInput">${escapeHtml(selectedTask.description)}</textarea>
+    <div id="taskDescriptionPreview" role="textbox" tabindex="0" aria-label="メモ（クリックまたはEnterで編集）">${linkifyText(selectedTask.description)}</div>
+    <textarea id="taskDescriptionInput" aria-label="メモを編集">${escapeHtml(selectedTask.description)}</textarea>
 `;
 
     const descriptionInput = document.getElementById("taskDescriptionInput");
@@ -321,6 +322,112 @@ function renderTaskDetail(selectedTask) {
 
         saveData();
     });
+
+    const preview = document.getElementById("taskDescriptionPreview");
+    function showMemoPreview() {
+        preview.innerHTML = linkifyText(descriptionInput.value);
+        preview.hidden = false;
+        descriptionInput.hidden = true;
+    }
+    function editMemo() {
+        const modalContent = document.querySelector(".modalContent");
+        const scrollTop = modalContent.scrollTop;
+        preview.hidden = true;
+        descriptionInput.hidden = false;
+        resizeDescription();
+        descriptionInput.focus({preventScroll: true});
+        modalContent.scrollTop = scrollTop;
+    }
+    preview.addEventListener("click", event => {
+        if (!event.target.closest("a") && window.getSelection().isCollapsed) editMemo();
+    });
+    preview.addEventListener("keydown", event => {
+        if (event.target === preview && event.key === "Enter") {
+            event.preventDefault();
+            editMemo();
+        }
+    });
+    descriptionInput.addEventListener("blur", showMemoPreview);
+    showMemoPreview();
+}
+
+
+// 保存値はプレーンテキストのまま、表示時だけ安全なHTTP(S)リンクへ変換する。
+function linkifyText(value) {
+    let html = "";
+    let offset = 0;
+    const text = String(value);
+    for (const match of text.matchAll(/https?:\/\/[^\s<>"'\u3000、。！？；：（）「」『』]+/g)) {
+        let url = match[0].replace(/[.,!?;:、。！？；：]+$/u, "");
+        // 文章の閉じ括弧は除外し、URL内で対応している丸括弧などは残す。
+        const pairs = [["(", ")"], ["[", "]"], ["{", "}"], ["（", "）"], ["「", "」"], ["『", "』"]];
+        let previous;
+        do {
+            previous = url;
+            url = url.replace(/[.,!?;:、。！？；：]+$/u, "");
+            for (const [open, close] of pairs) {
+                if (url.endsWith(close) && url.split(close).length > url.split(open).length) {
+                    url = url.slice(0, -close.length);
+                }
+            }
+        } while (url !== previous);
+        html += escapeHtml(text.slice(offset, match.index));
+        try {
+            const parsed = new URL(url);
+            if (!parsed.hostname || !["http:", "https:"].includes(parsed.protocol)) throw new Error("Invalid URL");
+            html += '<a class="textLink" href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(url) + '</a>';
+        } catch {
+            html += escapeHtml(url);
+        }
+        offset = match.index + url.length;
+    }
+    return html + escapeHtml(text.slice(offset));
+}
+
+let pendingChecklistPaste = null;
+function bindChecklistPaste(input, selectedTask, itemId = null) {
+    input.addEventListener("input", () => { pendingChecklistPaste = null; });
+    input.addEventListener("keydown", event => {
+        // 分割直後の新しい入力欄にはブラウザのUndo履歴がないため、一括操作を戻す。
+        if (event.ctrlKey && event.key.toLowerCase() === "z" && !event.shiftKey &&
+            !event.altKey && !event.isComposing && pendingChecklistPaste?.id === itemId &&
+            pendingChecklistPaste.snapshot === savedSnapshot) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            pendingChecklistPaste = null;
+            restoreHistory(undoHistory, redoHistory);
+        }
+    });
+    input.addEventListener("paste", event => {
+        if (event.isComposing || !event.clipboardData) return;
+        const pasted = event.clipboardData.getData("text/plain");
+        if (!/[\r\n]/.test(pasted)) return; // 単一行はブラウザ標準の貼り付け。
+        event.preventDefault();
+        if (!pasted.trim()) return;
+        const start = input.selectionStart ?? input.value.length;
+        const end = input.selectionEnd ?? start;
+        const combined = input.value.slice(0, start) + pasted + input.value.slice(end);
+        const lines = combined.split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);
+        if (!lines.length) return;
+        const index = itemId === null ? selectedTask.checklist.length : selectedTask.checklist.findIndex(item => item.id === itemId);
+        if (index < 0) return;
+        const original = itemId === null ? null : selectedTask.checklist[index];
+        // 貼り付け前の未確定文字も、Undoの復元先として保持する。
+        if (original && original.text !== input.value) {
+            original.text = input.value;
+            saveData();
+        }
+        const added = lines.map((text, i) => original && i === 0
+            ? {...original, text}
+            : {id: nextChecklistId++, text, done: false});
+        selectedTask.checklist.splice(index, original ? 1 : 0, ...added);
+        editingChecklistId = added[added.length - 1].id;
+        editingCursorOffset = added[added.length - 1].text.length;
+        showChecklistInput = false;
+        saveData(); // 一括貼り付け全体を1つの履歴として保存。
+        pendingChecklistPaste = {id: editingChecklistId, snapshot: savedSnapshot};
+        renderTree();
+    });
 }
 
 function createChecklistView(task) {
@@ -374,7 +481,7 @@ function createChecklistView(task) {
                 <span
                 class="checkText"
                 data-id="${item.id}">
-                    ${escapeHtml(item.text)}
+                    ${linkifyText(item.text)}
                 </span>
 
                 <button
@@ -430,7 +537,8 @@ function bindTaskEvents() {
     const taskElements = document.querySelectorAll(".task");
 
     taskElements.forEach((element) => {
-        element.addEventListener("click", function () {
+        element.addEventListener("click", function (event) {
+            if (event.target.closest("a")) return;
             selectedTaskId = Number(this.dataset.id);
 
             renderTree();
@@ -516,7 +624,7 @@ function bindChecklistDragEvents(selectedTask) {
     checklistSortable = new Sortable(list, {
         animation: 120,
 
-        filter: ".editChecklistInput, #newChecklistText",
+        filter: ".checkText, a, .editChecklistInput, #newChecklistText",
         preventOnFilter: false,
 
         onStart: function () {
@@ -550,6 +658,7 @@ function bindCheckTextEvents(selectedTask) {
     checkTexts.forEach((element) => {
         element.addEventListener("click", function (event) {
             event.stopPropagation();
+            if (event.target.closest("a") || !window.getSelection().isCollapsed) return;
 
             const id = Number(this.dataset.id);
 
@@ -606,9 +715,11 @@ function bindChecklistAddEvents(selectedTask) {
         return;
     }
 
+    bindChecklistPaste(input, selectedTask);
+
     let saved = false;
 
-    function saveNewChecklist() {
+    function saveNewChecklist(continueEditing = false) {
         if (saved) {
             return;
         }
@@ -631,7 +742,7 @@ function bindChecklistAddEvents(selectedTask) {
             done: false
         });
 
-        showChecklistInput = false;
+        showChecklistInput = continueEditing;
 
         saveData();
         renderTree();
@@ -639,10 +750,11 @@ function bindChecklistAddEvents(selectedTask) {
 
     // Enterで保存
     input.addEventListener("keydown", function (event) {
+        if (event.isComposing || event.keyCode === 229) return;
         if (event.key === "Enter") {
             event.preventDefault();
 
-            saveNewChecklist();
+            saveNewChecklist(true);
         }
     });
 
@@ -672,11 +784,10 @@ function bindChecklistDeleteEvents(selectedTask) {
         button.addEventListener("click", function (event) {
             event.stopPropagation();
             const id = Number(this.dataset.id);
-            confirmDeletion(() => {
-                selectedTask.checklist = selectedTask.checklist.filter((item) => item.id !== id);
-                saveData();
-                renderTree();
-            });
+            selectedTask.checklist = selectedTask.checklist.filter((item) => item.id !== id);
+            if (editingChecklistId === id) editingChecklistId = null;
+            saveData();
+            renderTree();
         });
     });
 }
@@ -685,6 +796,7 @@ function bindChecklistEditEvents(selectedTask) {
     const editInputs = document.querySelectorAll(".editChecklistInput");
 
     editInputs.forEach((input) => {
+        bindChecklistPaste(input, selectedTask, Number(input.dataset.id));
 
         input.focus();
 
@@ -727,10 +839,11 @@ function bindChecklistEditEvents(selectedTask) {
 
                 text.className = "checkText";
                 text.dataset.id = this.dataset.id;
-                text.textContent = this.value.trim();
+                text.innerHTML = linkifyText(this.value.trim());
 
                 text.addEventListener("click", function (event) {
                     event.stopPropagation();
+                    if (event.target.closest("a") || !window.getSelection().isCollapsed) return;
 
                     const id = Number(this.dataset.id);
 
@@ -769,6 +882,7 @@ function bindChecklistEditEvents(selectedTask) {
         });
 
         input.addEventListener("keydown", function (event) {
+            if (event.isComposing || event.keyCode === 229) return;
 
             if (event.key === "Tab" && !event.shiftKey) {
                 event.preventDefault();
@@ -800,8 +914,8 @@ function bindChecklistEditEvents(selectedTask) {
                 return;
             }
 
-            // Alt + Enter → 改行
-            if (event.key === "Enter" && event.altKey) {
+            // Alt / Shift + Enter → 改行
+            if (event.key === "Enter" && (event.altKey || event.shiftKey)) {
                 event.preventDefault();
 
                 const start = this.selectionStart;
@@ -814,12 +928,20 @@ function bindChecklistEditEvents(selectedTask) {
                 return;
             }
 
-            // Enter → 保存
+            // Enter → 確定して次の項目へ。末尾では新規入力欄を開く。
             if (event.key === "Enter") {
                 event.preventDefault();
-
-                saveChecklistEdit(this, selectedTask);
-
+                const index = selectedTask.checklist.findIndex(item => item.id === Number(this.dataset.id));
+                saveChecklistEdit(this, selectedTask, false);
+                const nextItem = selectedTask.checklist[index + 1];
+                if (nextItem) {
+                    editingChecklistId = nextItem.id;
+                    editingCursorOffset = nextItem.text.length;
+                    showChecklistInput = false;
+                } else {
+                    showChecklistInput = true;
+                }
+                renderTree();
                 return;
             }
 
@@ -1245,4 +1367,27 @@ document.getElementById("restoreFile").addEventListener("change", function (even
     };
 
     reader.readAsText(file);
+});
+// 選択された項目のテキストのみを、表示順でプレーンテキストへコピーする。
+document.addEventListener("copy", event => {
+    if (event.defaultPrevented || !event.clipboardData ||
+        document.activeElement?.closest("input, textarea, [contenteditable]:not([contenteditable='false'])")) return;
+    const selection = window.getSelection();
+    const list = document.getElementById("sortableChecklist");
+    if (!list || !selection || selection.isCollapsed || selection.rangeCount !== 1) return;
+    const range = selection.getRangeAt(0);
+    if (!list.contains(range.startContainer) || !list.contains(range.endContainer)) return;
+    const lines = [];
+    list.querySelectorAll(".checkText").forEach(text => {
+        if (!range.intersectsNode(text)) return;
+        const part = document.createRange();
+        part.selectNodeContents(text);
+        if (range.compareBoundaryPoints(0, part) > 0) part.setStart(range.startContainer, range.startOffset);
+        if (range.compareBoundaryPoints(2, part) < 0) part.setEnd(range.endContainer, range.endOffset);
+        const value = part.toString().trim().replace(/\r?\n/g, " ");
+        if (value) lines.push(value);
+    });
+    if (!lines.length) return;
+    event.clipboardData.setData("text/plain", lines.join("\n"));
+    event.preventDefault();
 });
